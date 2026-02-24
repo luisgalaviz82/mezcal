@@ -121,6 +121,12 @@ body {
 }
 .card-sub { font-size: 13px; color: var(--text-light); margin-bottom: 14px; }
 .chart-wrap { position: relative; width: 100%; }
+.chart-wrap canvas { width: 100% !important; }
+.chart-h300 { height: 300px; }
+.chart-h320 { height: 320px; }
+.chart-h240 { height: 240px; }
+.chart-h200 { height: 200px; }
+.chart-h280 { height: 280px; }
 
 /* Grid layouts */
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
@@ -313,7 +319,7 @@ body {
     <div class="card animate-in delay-2">
       <div class="card-title" id="revenueChartTitle">Revenue by Year</div>
       <div class="card-sub" id="revenueChartSub">Yearly payout totals</div>
-      <div class="chart-wrap"><canvas id="revenueChart" height="300"></canvas></div>
+      <div class="chart-wrap chart-h300"><canvas id="revenueChart"></canvas></div>
     </div>
 
     <div class="grid-2">
@@ -321,7 +327,7 @@ body {
         <div class="card-title">Platform Split</div>
         <div class="card-sub">Airbnb vs VRBO breakdown</div>
         <div class="platform-row">
-          <div class="platform-chart"><canvas id="platformChart" height="200"></canvas></div>
+          <div class="platform-chart"><div class="chart-wrap chart-h200"><canvas id="platformChart"></canvas></div></div>
           <div class="platform-details">
             <div class="platform-item">
               <div class="platform-name"><div class="platform-dot" style="background:var(--coral)"></div><span>Airbnb</span></div>
@@ -338,7 +344,7 @@ body {
       <div class="card animate-in delay-4">
         <div class="card-title">Day of Week Pricing</div>
         <div class="card-sub">Average nightly rate by check-in day</div>
-        <div class="chart-wrap"><canvas id="dowChart" height="200"></canvas></div>
+        <div class="chart-wrap chart-h200"><canvas id="dowChart"></canvas></div>
       </div>
     </div>
   </div>
@@ -348,19 +354,19 @@ body {
     <div class="card">
       <div class="card-title">Annual Financial Summary</div>
       <div class="card-sub">Payout, gross payment, and commissions paid by year</div>
-      <div class="chart-wrap"><canvas id="financialChart" height="320"></canvas></div>
+      <div class="chart-wrap chart-h320"><canvas id="financialChart"></canvas></div>
     </div>
 
     <div class="grid-2">
       <div class="card">
         <div class="card-title">Nightly Rate Trend</div>
         <div class="card-sub">Net payout per night by year</div>
-        <div class="chart-wrap"><canvas id="nightlyChart" height="240"></canvas></div>
+        <div class="chart-wrap chart-h240"><canvas id="nightlyChart"></canvas></div>
       </div>
       <div class="card">
         <div class="card-title">Occupancy Volume</div>
         <div class="card-sub">Total guest nights booked per year</div>
-        <div class="chart-wrap"><canvas id="nightsChart" height="240"></canvas></div>
+        <div class="chart-wrap chart-h240"><canvas id="nightsChart"></canvas></div>
       </div>
     </div>
 
@@ -384,19 +390,19 @@ body {
       <div class="card">
         <div class="card-title">Top Guest States</div>
         <div class="card-sub">Where your guests come from</div>
-        <div class="chart-wrap"><canvas id="statesChart" height="280"></canvas></div>
+        <div class="chart-wrap chart-h280"><canvas id="statesChart"></canvas></div>
       </div>
       <div class="card">
         <div class="card-title">Top Guest Cities</div>
         <div class="card-sub">Most frequent guest origin cities</div>
-        <div class="chart-wrap"><canvas id="citiesChart" height="280"></canvas></div>
+        <div class="chart-wrap chart-h280"><canvas id="citiesChart"></canvas></div>
       </div>
     </div>
     <div class="grid-2">
       <div class="card">
         <div class="card-title">Guest Volume Trend</div>
         <div class="card-sub">Total guests hosted per year</div>
-        <div class="chart-wrap"><canvas id="guestTrendChart" height="240"></canvas></div>
+        <div class="chart-wrap chart-h240"><canvas id="guestTrendChart"></canvas></div>
       </div>
       <div class="card">
         <div class="card-title">Repeat Guest Insight</div>
@@ -452,7 +458,7 @@ body {
       <div class="card">
         <div class="card-title">Year-over-Year Comparison</div>
         <div class="card-sub">Revenue and volume progression</div>
-        <div class="chart-wrap"><canvas id="yoyChart" height="300"></canvas></div>
+        <div class="chart-wrap chart-h300"><canvas id="yoyChart"></canvas></div>
       </div>
     </div>
 
@@ -794,10 +800,13 @@ document.getElementById('tabs').addEventListener('click', e => {
   document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
   document.getElementById('tab-' + tab).classList.add('active');
 
-  // Lazy-render charts for the tab
-  if (tab === 'revenue' && !charts.financial) { renderFinancialChart(); renderNightlyChart(); renderNightsChart(); renderYearTable(); }
-  if (tab === 'guests' && !charts.states) { renderStatesChart(); renderCitiesChart(); renderGuestTrendChart(); }
-  if (tab === 'insights' && !charts.yoy) { renderYoyChart(); }
+  // Render charts AFTER the tab is visible (setTimeout ensures display:block is applied)
+  setTimeout(() => {
+    if (tab === 'overview') { renderRevenueChart(); renderPlatformChart(); renderDowChart(); }
+    if (tab === 'revenue') { renderFinancialChart(); renderNightlyChart(); renderNightsChart(); renderYearTable(); }
+    if (tab === 'guests') { renderStatesChart(); renderCitiesChart(); renderGuestTrendChart(); }
+    if (tab === 'insights') { renderYoyChart(); }
+  }, 50);
 });
 
 // ============ YEAR FILTER ============
