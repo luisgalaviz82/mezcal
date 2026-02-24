@@ -12,145 +12,63 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
 :root {
-  --coral: #FF5A5F;
-  --coral-light: #FF8A8D;
-  --teal: #00A699;
-  --teal-light: #66C3BC;
-  --gold: #FFB400;
-  --purple: #914669;
-  --navy: #2D3436;
-  --bg: #FAFAF8;
-  --card: #FFFFFF;
-  --text: #1A1A1A;
-  --text-mid: #4A4A4A;
-  --text-light: #8B8B8B;
-  --border: #E8E8E4;
-  --border-light: #F0F0EC;
+  --coral: #FF5A5F; --coral-light: #FF8A8D; --teal: #00A699; --teal-light: #66C3BC;
+  --gold: #FFB400; --purple: #914669; --navy: #2D3436;
+  --bg: #FAFAF8; --card: #FFFFFF; --text: #1A1A1A; --text-mid: #4A4A4A; --text-light: #8B8B8B;
+  --border: #E8E8E4; --border-light: #F0F0EC;
   --font: 'DM Sans', -apple-system, sans-serif;
   --display: 'Playfair Display', Georgia, serif;
 }
-
 * { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: var(--font); background: var(--bg); color: var(--text); -webkit-font-smoothing: antialiased; }
 
-body {
-  font-family: var(--font);
-  background: var(--bg);
-  color: var(--text);
-  -webkit-font-smoothing: antialiased;
-  min-height: 100vh;
-}
-
-/* Header */
-.header {
-  background: var(--card);
-  border-bottom: 1px solid var(--border);
-  position: sticky; top: 0; z-index: 100;
-}
-.header-inner {
-  max-width: 1240px; margin: 0 auto;
-  padding: 0 24px; height: 60px;
-  display: flex; align-items: center; justify-content: space-between;
-}
+.header { background: var(--card); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; }
+.header-inner { max-width: 1240px; margin: 0 auto; padding: 0 24px; height: 60px; display: flex; align-items: center; justify-content: space-between; }
 .logo { display: flex; align-items: center; gap: 10px; }
-.logo-icon {
-  width: 34px; height: 34px; border-radius: 9px;
-  background: linear-gradient(135deg, var(--coral), var(--coral-light));
-  display: flex; align-items: center; justify-content: center;
-  color: #fff; font-weight: 800; font-size: 16px; font-family: var(--display);
-}
+.logo-icon { width: 34px; height: 34px; border-radius: 9px; background: linear-gradient(135deg, var(--coral), var(--coral-light)); display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 800; font-size: 16px; font-family: var(--display); }
 .logo-text { font-family: var(--display); font-size: 19px; font-weight: 700; }
-
-/* Tabs */
 .tabs { display: flex; gap: 2px; }
-.tab-btn {
-  padding: 7px 16px; border-radius: 7px; border: none; cursor: pointer;
-  font-family: var(--font); font-size: 13px; font-weight: 600;
-  background: transparent; color: var(--text-light); transition: all 0.2s;
-}
+.tab-btn { padding: 7px 16px; border-radius: 7px; border: none; cursor: pointer; font-family: var(--font); font-size: 13px; font-weight: 600; background: transparent; color: var(--text-light); transition: all 0.2s; }
 .tab-btn.active { background: var(--coral); color: #fff; }
 .tab-btn:hover:not(.active) { background: var(--border-light); }
-
-/* Year Filter */
-.year-filter { display: flex; gap: 4px; align-items: center; }
+.year-filter { display: flex; gap: 4px; align-items: center; flex-wrap: wrap; }
 .year-label { font-size: 12px; color: var(--text-light); margin-right: 6px; }
-.year-btn {
-  padding: 5px 10px; border-radius: 6px; cursor: pointer;
-  border: 1px solid var(--border); background: transparent;
-  color: var(--text-light); font-size: 12px; font-weight: 600;
-  font-family: var(--font); transition: all 0.15s;
-}
-.year-btn.active {
-  border-color: var(--coral); background: rgba(255,90,95,0.06); color: var(--coral);
-}
+.year-btn { padding: 5px 10px; border-radius: 6px; cursor: pointer; border: 1px solid var(--border); background: transparent; color: var(--text-light); font-size: 12px; font-weight: 600; font-family: var(--font); transition: all 0.15s; }
+.year-btn.active { border-color: var(--coral); background: rgba(255,90,95,0.06); color: var(--coral); }
 
-/* Main */
 .main { max-width: 1240px; margin: 0 auto; padding: 24px 24px 60px; }
-.tab-content { display: none; }
-.tab-content.active { display: block; }
 
-/* KPI Cards */
-.kpi-grid {
-  display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; margin-bottom: 24px;
-}
-.kpi-card {
-  background: var(--card); border-radius: 14px; padding: 22px 20px;
-  border: 1px solid var(--border); position: relative; overflow: hidden;
-  transition: all 0.25s;
-}
+/* CRITICAL FIX: Use offscreen positioning instead of display:none */
+.tab-panel { position: absolute; left: -9999px; width: 100%; visibility: hidden; }
+.tab-panel.active { position: relative; left: 0; visibility: visible; }
+.tabs-container { position: relative; overflow: hidden; }
+
+.kpi-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; margin-bottom: 24px; }
+.kpi-card { background: var(--card); border-radius: 14px; padding: 22px 20px; border: 1px solid var(--border); position: relative; overflow: hidden; transition: all 0.25s; }
 .kpi-card:hover { box-shadow: 0 6px 24px rgba(0,0,0,0.06); transform: translateY(-1px); }
-.kpi-accent {
-  position: absolute; top: -8px; right: -8px; width: 50px; height: 50px;
-  border-radius: 50%; opacity: 0.06;
-}
-.kpi-label {
-  font-size: 11px; color: var(--text-light); letter-spacing: 0.06em;
-  text-transform: uppercase; font-weight: 600; margin-bottom: 5px;
-}
-.kpi-value {
-  font-family: var(--display); font-size: 28px; font-weight: 700; line-height: 1.1;
-}
+.kpi-accent { position: absolute; top: -8px; right: -8px; width: 50px; height: 50px; border-radius: 50%; opacity: 0.06; }
+.kpi-label { font-size: 11px; color: var(--text-light); letter-spacing: 0.06em; text-transform: uppercase; font-weight: 600; margin-bottom: 5px; }
+.kpi-value { font-family: var(--display); font-size: 28px; font-weight: 700; line-height: 1.1; }
 .kpi-sub { font-size: 12px; color: var(--text-light); margin-top: 6px; }
 
-/* Cards & Charts */
-.card {
-  background: var(--card); border-radius: 14px; padding: 22px;
-  border: 1px solid var(--border); margin-bottom: 20px;
-}
-.card-title {
-  font-family: var(--display); font-size: 18px; font-weight: 700; margin-bottom: 2px;
-}
+.card { background: var(--card); border-radius: 14px; padding: 22px; border: 1px solid var(--border); margin-bottom: 20px; }
+.card-title { font-family: var(--display); font-size: 18px; font-weight: 700; margin-bottom: 2px; }
 .card-sub { font-size: 13px; color: var(--text-light); margin-bottom: 14px; }
-.chart-wrap { position: relative; width: 100%; }
-.chart-wrap canvas { width: 100% !important; }
-.chart-h300 { height: 300px; }
-.chart-h320 { height: 320px; }
-.chart-h240 { height: 240px; }
-.chart-h200 { height: 200px; }
-.chart-h280 { height: 280px; }
 
-/* Grid layouts */
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
 .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
 
-/* Platform split */
 .platform-row { display: flex; align-items: center; gap: 20px; }
 .platform-chart { width: 45%; min-width: 160px; }
 .platform-details { flex: 1; }
-.platform-item {
-  margin-bottom: 12px; padding: 12px 14px; background: var(--bg); border-radius: 10px;
-}
+.platform-item { margin-bottom: 12px; padding: 12px 14px; background: var(--bg); border-radius: 10px; }
 .platform-name { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
 .platform-dot { width: 10px; height: 10px; border-radius: 3px; }
 .platform-name span { font-size: 14px; font-weight: 600; }
 .platform-stats { font-size: 12px; color: var(--text-light); line-height: 1.7; }
 
-/* Table */
 .data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-.data-table th {
-  padding: 10px 12px; text-align: left; font-weight: 600;
-  color: var(--text-light); font-size: 11px; text-transform: uppercase;
-  letter-spacing: 0.05em; border-bottom: 2px solid var(--border);
-}
+.data-table th { padding: 10px 12px; text-align: left; font-weight: 600; color: var(--text-light); font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 2px solid var(--border); }
 .data-table td { padding: 10px 12px; border-bottom: 1px solid var(--border-light); }
 .data-table tbody tr:hover { background: var(--bg); }
 .td-bold { font-weight: 700; }
@@ -158,76 +76,52 @@ body {
 .td-teal { font-weight: 600; color: var(--teal); }
 .td-purple { color: var(--purple); }
 
-/* Insight items */
-.insight-item {
-  display: flex; gap: 12px; padding: 12px 14px;
-  background: var(--bg); border-radius: 10px; margin-bottom: 10px;
-}
+.insight-item { display: flex; gap: 12px; padding: 12px 14px; background: var(--bg); border-radius: 10px; margin-bottom: 10px; }
 .insight-bar { width: 4px; border-radius: 2px; flex-shrink: 0; }
 .insight-label { font-size: 13px; font-weight: 700; margin-bottom: 2px; }
 .insight-detail { font-size: 12px; color: var(--text-mid); line-height: 1.5; }
 
-/* Highlight cards */
-.highlight-card { text-align: left; }
 .highlight-icon { font-size: 28px; margin-bottom: 8px; }
-.highlight-label {
-  font-size: 11px; color: var(--text-light); text-transform: uppercase;
-  letter-spacing: 0.06em; font-weight: 600; margin-bottom: 4px;
-}
-.highlight-value {
-  font-family: var(--display); font-size: 26px; font-weight: 700; margin-bottom: 8px;
-}
+.highlight-label { font-size: 11px; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; margin-bottom: 4px; }
+.highlight-value { font-family: var(--display); font-size: 26px; font-weight: 700; margin-bottom: 8px; }
 .highlight-sub { font-size: 13px; color: var(--text-mid); line-height: 1.6; }
 
-/* Recommendation cards */
-.rec-card {
-  padding: 20px; border-radius: 12px; border-left: 3px solid;
-}
+.rec-card { padding: 20px; border-radius: 12px; border-left: 3px solid; }
 .rec-icon { font-size: 22px; margin-bottom: 8px; }
 .rec-title { font-size: 14px; font-weight: 700; margin-bottom: 6px; }
 .rec-text { font-size: 13px; color: var(--text-mid); line-height: 1.55; }
 
-/* Repeat guest ring */
 .ring-wrap { display: flex; align-items: center; justify-content: center; min-height: 220px; }
 .ring-container { text-align: center; }
 .ring-svg { width: 140px; height: 140px; }
-.ring-label {
-  position: relative; margin-top: -95px; margin-bottom: 48px;
-  font-family: var(--display); font-size: 28px; font-weight: 700; color: var(--teal);
-}
+.ring-label { position: relative; margin-top: -95px; margin-bottom: 48px; font-family: var(--display); font-size: 28px; font-weight: 700; color: var(--teal); }
 .ring-sublabel { font-size: 11px; color: var(--text-light); font-family: var(--font); font-weight: 400; }
 .ring-stats { font-size: 13px; color: var(--text-mid); margin-top: 8px; }
 
-/* Listing card */
-.listing-banner {
-  background: linear-gradient(135deg, #1a1a1a 0%, #2d3436 100%);
-  border-radius: 14px; padding: 24px; margin-bottom: 20px;
-  display: flex; align-items: center; gap: 20px; color: #fff;
-}
-.listing-badge {
-  background: var(--coral); color: #fff; font-size: 11px; font-weight: 700;
-  padding: 3px 8px; border-radius: 5px; display: inline-block; margin-bottom: 6px;
-}
+.listing-banner { background: linear-gradient(135deg, #1a1a1a 0%, #2d3436 100%); border-radius: 14px; padding: 24px; margin-bottom: 20px; display: flex; align-items: center; gap: 20px; color: #fff; }
+.listing-badge { background: var(--coral); color: #fff; font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 5px; display: inline-block; margin-bottom: 6px; }
 .listing-title { font-family: var(--display); font-size: 22px; font-weight: 700; margin-bottom: 4px; }
 .listing-details { font-size: 13px; color: rgba(255,255,255,0.7); line-height: 1.6; }
-.listing-rating {
-  display: flex; align-items: center; gap: 6px;
-  font-size: 14px; font-weight: 600; margin-top: 8px;
-}
+.listing-rating { display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 600; margin-top: 8px; }
 .listing-stats { display: flex; gap: 28px; margin-left: auto; }
 .listing-stat-item { text-align: center; }
 .listing-stat-val { font-family: var(--display); font-size: 24px; font-weight: 700; }
 .listing-stat-label { font-size: 11px; color: rgba(255,255,255,0.6); text-transform: uppercase; letter-spacing: 0.05em; }
 
-/* Mobile responsive */
+/* Canvas containers - explicit heights for Chart.js */
+.ch-300 { position: relative; height: 300px; }
+.ch-320 { position: relative; height: 320px; }
+.ch-240 { position: relative; height: 240px; }
+.ch-220 { position: relative; height: 220px; }
+.ch-200 { position: relative; height: 200px; }
+.ch-280 { position: relative; height: 280px; }
+
 @media (max-width: 900px) {
   .kpi-grid { grid-template-columns: repeat(3, 1fr); }
-  .grid-2 { grid-template-columns: 1fr; }
-  .grid-3 { grid-template-columns: 1fr; }
+  .grid-2, .grid-3 { grid-template-columns: 1fr; }
   .listing-banner { flex-direction: column; align-items: flex-start; }
   .listing-stats { margin-left: 0; margin-top: 16px; }
   .header-inner { flex-wrap: wrap; height: auto; padding: 12px 16px; gap: 10px; }
-  .year-filter { flex-wrap: wrap; }
 }
 @media (max-width: 600px) {
   .kpi-grid { grid-template-columns: repeat(2, 1fr); }
@@ -243,18 +137,9 @@ body {
   .data-table th, .data-table td { padding: 8px 6px; }
   .listing-stats { gap: 16px; }
 }
-
-/* Animations */
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(12px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-.animate-in { animation: fadeUp 0.4s ease both; }
-.delay-1 { animation-delay: 0.05s; }
-.delay-2 { animation-delay: 0.1s; }
-.delay-3 { animation-delay: 0.15s; }
-.delay-4 { animation-delay: 0.2s; }
-.delay-5 { animation-delay: 0.25s; }
+@keyframes fadeUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+.anim { animation: fadeUp 0.4s ease both; }
+.d1 { animation-delay:.05s } .d2 { animation-delay:.1s } .d3 { animation-delay:.15s } .d4 { animation-delay:.2s } .d5 { animation-delay:.25s }
 </style>
 </head>
 <body>
@@ -285,211 +170,155 @@ body {
 </header>
 
 <main class="main">
-
-  <!-- ========== LISTING BANNER ========== -->
-  <div class="listing-banner animate-in">
+  <div class="listing-banner anim">
     <div>
       <span class="listing-badge">★ SUPERHOST · GUEST FAVORITE</span>
       <div class="listing-title">Historic Adobe in Barrio Viejo</div>
       <div class="listing-details">Tucson, AZ · 3 bed · 3 bath · Sleeps 7 · 2,100 sq ft</div>
-      <div class="listing-rating">
-        <span style="color: var(--gold);">★</span> 4.95 &nbsp;·&nbsp; 43 reviews &nbsp;·&nbsp; 5 years hosting
-      </div>
+      <div class="listing-rating"><span style="color:var(--gold)">★</span> 4.95 · 43 reviews · 5 years hosting</div>
     </div>
     <div class="listing-stats">
-      <div class="listing-stat-item">
-        <div class="listing-stat-val">192</div>
-        <div class="listing-stat-label">Bookings</div>
-      </div>
-      <div class="listing-stat-item">
-        <div class="listing-stat-val">863</div>
-        <div class="listing-stat-label">Nights</div>
-      </div>
-      <div class="listing-stat-item">
-        <div class="listing-stat-val">$206K</div>
-        <div class="listing-stat-label">Earned</div>
-      </div>
+      <div class="listing-stat-item"><div class="listing-stat-val">192</div><div class="listing-stat-label">Bookings</div></div>
+      <div class="listing-stat-item"><div class="listing-stat-val">863</div><div class="listing-stat-label">Nights</div></div>
+      <div class="listing-stat-item"><div class="listing-stat-val">$206K</div><div class="listing-stat-label">Earned</div></div>
     </div>
   </div>
 
-  <!-- ========== OVERVIEW TAB ========== -->
-  <div class="tab-content active" id="tab-overview">
-    <div class="kpi-grid" id="kpiGrid"></div>
+  <div class="tabs-container">
 
-    <div class="card animate-in delay-2">
-      <div class="card-title" id="revenueChartTitle">Revenue by Year</div>
-      <div class="card-sub" id="revenueChartSub">Yearly payout totals</div>
-      <div style="position:relative;width:100%;height:300px"><canvas id="revenueChart"></canvas></div>
-    </div>
-
-    <div class="grid-2">
-      <div class="card animate-in delay-3">
-        <div class="card-title">Platform Split</div>
-        <div class="card-sub">Airbnb vs VRBO breakdown</div>
-        <div class="platform-row">
-          <div class="platform-chart"><div style="position:relative;width:100%;height:200px"><canvas id="platformChart"></canvas></div></div>
-          <div class="platform-details">
-            <div class="platform-item">
-              <div class="platform-name"><div class="platform-dot" style="background:var(--coral)"></div><span>Airbnb</span></div>
-              <div class="platform-stats">173 bookings · $174.4K payout<br>748 nights · $252/night avg</div>
-            </div>
-            <div class="platform-item">
-              <div class="platform-name"><div class="platform-dot" style="background:var(--teal)"></div><span>VRBO</span></div>
-              <div class="platform-stats">19 bookings · $32.0K payout<br>115 nights · $374/night avg</div>
+    <!-- OVERVIEW -->
+    <div class="tab-panel active" id="tab-overview">
+      <div class="kpi-grid" id="kpiGrid"></div>
+      <div class="card">
+        <div class="card-title" id="revTitle">Revenue by Year</div>
+        <div class="card-sub" id="revSub">Yearly payout totals</div>
+        <div class="ch-300"><canvas id="chartRevenue"></canvas></div>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">Platform Split</div>
+          <div class="card-sub">Airbnb vs VRBO breakdown</div>
+          <div class="platform-row">
+            <div class="platform-chart"><div class="ch-200"><canvas id="chartPlatform"></canvas></div></div>
+            <div class="platform-details">
+              <div class="platform-item"><div class="platform-name"><div class="platform-dot" style="background:var(--coral)"></div><span>Airbnb</span></div><div class="platform-stats">173 bookings · $174.4K payout<br>748 nights · $252/night avg</div></div>
+              <div class="platform-item"><div class="platform-name"><div class="platform-dot" style="background:var(--teal)"></div><span>VRBO</span></div><div class="platform-stats">19 bookings · $32.0K payout<br>115 nights · $374/night avg</div></div>
             </div>
           </div>
         </div>
-      </div>
-
-      <div class="card animate-in delay-4">
-        <div class="card-title">Day of Week Pricing</div>
-        <div class="card-sub">Average nightly rate by check-in day</div>
-        <div style="position:relative;width:100%;height:220px"><canvas id="dowChart"></canvas></div>
+        <div class="card">
+          <div class="card-title">Day of Week Pricing</div>
+          <div class="card-sub">Average nightly rate by check-in day</div>
+          <div class="ch-220"><canvas id="chartDow"></canvas></div>
+        </div>
       </div>
     </div>
-  </div>
 
-  <!-- ========== REVENUE TAB ========== -->
-  <div class="tab-content" id="tab-revenue">
-    <div class="card">
-      <div class="card-title">Annual Financial Summary</div>
-      <div class="card-sub">Payout, gross payment, and commissions paid by year</div>
-      <div style="position:relative;width:100%;height:320px"><canvas id="financialChart"></canvas></div>
-    </div>
-
-    <div class="grid-2">
+    <!-- REVENUE -->
+    <div class="tab-panel" id="tab-revenue">
       <div class="card">
-        <div class="card-title">Nightly Rate Trend</div>
-        <div class="card-sub">Net payout per night by year</div>
-        <div style="position:relative;width:100%;height:240px"><canvas id="nightlyChart"></canvas></div>
+        <div class="card-title">Annual Financial Summary</div>
+        <div class="card-sub">Payout, gross payment, and commissions paid by year</div>
+        <div class="ch-320"><canvas id="chartFinancial"></canvas></div>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">Nightly Rate Trend</div>
+          <div class="card-sub">Net payout per night by year</div>
+          <div class="ch-240"><canvas id="chartNightly"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Occupancy Volume</div>
+          <div class="card-sub">Total guest nights booked per year</div>
+          <div class="ch-240"><canvas id="chartNights"></canvas></div>
+        </div>
       </div>
       <div class="card">
-        <div class="card-title">Occupancy Volume</div>
-        <div class="card-sub">Total guest nights booked per year</div>
-        <div style="position:relative;width:100%;height:240px"><canvas id="nightsChart"></canvas></div>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-title">Year-over-Year Details</div>
-      <div class="card-sub">All key financial metrics by year</div>
-      <div style="overflow-x:auto;">
-        <table class="data-table">
-          <thead><tr>
+        <div class="card-title">Year-over-Year Details</div>
+        <div class="card-sub">All key financial metrics by year</div>
+        <div style="overflow-x:auto">
+          <table class="data-table"><thead><tr>
             <th>Year</th><th>Gross</th><th>Payout</th><th>Commission</th><th>Bookings</th><th>Nights</th><th>Guests</th><th>Avg/Night</th><th>Avg Stay</th>
-          </tr></thead>
-          <tbody id="yearTable"></tbody>
-        </table>
+          </tr></thead><tbody id="yearTable"></tbody></table>
+        </div>
       </div>
     </div>
-  </div>
 
-  <!-- ========== GUESTS TAB ========== -->
-  <div class="tab-content" id="tab-guests">
-    <div class="grid-2">
-      <div class="card">
-        <div class="card-title">Top Guest States</div>
-        <div class="card-sub">Where your guests come from</div>
-        <div style="position:relative;width:100%;height:280px"><canvas id="statesChart"></canvas></div>
+    <!-- GUESTS -->
+    <div class="tab-panel" id="tab-guests">
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">Top Guest States</div>
+          <div class="card-sub">Where your guests come from</div>
+          <div class="ch-280"><canvas id="chartStates"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Top Guest Cities</div>
+          <div class="card-sub">Most frequent guest origin cities</div>
+          <div class="ch-280"><canvas id="chartCities"></canvas></div>
+        </div>
       </div>
-      <div class="card">
-        <div class="card-title">Top Guest Cities</div>
-        <div class="card-sub">Most frequent guest origin cities</div>
-        <div style="position:relative;width:100%;height:280px"><canvas id="citiesChart"></canvas></div>
-      </div>
-    </div>
-    <div class="grid-2">
-      <div class="card">
-        <div class="card-title">Guest Volume Trend</div>
-        <div class="card-sub">Total guests hosted per year</div>
-        <div style="position:relative;width:100%;height:240px"><canvas id="guestTrendChart"></canvas></div>
-      </div>
-      <div class="card">
-        <div class="card-title">Repeat Guest Insight</div>
-        <div class="card-sub">8 of 183 unique guests returned (4.4%)</div>
-        <div class="ring-wrap">
-          <div class="ring-container">
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">Guest Volume Trend</div>
+          <div class="card-sub">Total guests hosted per year</div>
+          <div class="ch-240"><canvas id="chartGuestTrend"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Repeat Guest Insight</div>
+          <div class="card-sub">8 of 183 unique guests returned (4.4%)</div>
+          <div class="ring-wrap"><div class="ring-container">
             <svg class="ring-svg" viewBox="0 0 36 36">
               <circle cx="18" cy="18" r="15.9" fill="none" stroke="#F0F0EC" stroke-width="2.5"/>
-              <circle cx="18" cy="18" r="15.9" fill="none" stroke="#00A699" stroke-width="2.5"
-                stroke-dasharray="4.4 95.6" stroke-linecap="round" transform="rotate(-90 18 18)"/>
+              <circle cx="18" cy="18" r="15.9" fill="none" stroke="#00A699" stroke-width="2.5" stroke-dasharray="4.4 95.6" stroke-linecap="round" transform="rotate(-90 18 18)"/>
             </svg>
             <div class="ring-label">4.4%<div class="ring-sublabel">repeat</div></div>
             <div class="ring-stats"><strong>183</strong> unique guests · <strong>8</strong> returned</div>
-          </div>
+          </div></div>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- ========== INSIGHTS TAB ========== -->
-  <div class="tab-content" id="tab-insights">
-    <div class="grid-3" style="margin-bottom:20px;">
-      <div class="card highlight-card">
-        <div class="highlight-icon">🏆</div>
-        <div class="highlight-label">Best Year</div>
-        <div class="highlight-value" style="color:var(--gold)">2024</div>
-        <div class="highlight-sub">$41.9K payout from 53 bookings — your highest volume year with strong month-over-month consistency.</div>
+    <!-- INSIGHTS -->
+    <div class="tab-panel" id="tab-insights">
+      <div class="grid-3" style="margin-bottom:20px">
+        <div class="card"><div class="highlight-icon">🏆</div><div class="highlight-label">Best Year</div><div class="highlight-value" style="color:var(--gold)">2024</div><div class="highlight-sub">$41.9K payout from 53 bookings — your highest volume year with strong month-over-month consistency.</div></div>
+        <div class="card"><div class="highlight-icon">📈</div><div class="highlight-label">Highest Nightly Rate</div><div class="highlight-value" style="color:var(--teal)">$376/night</div><div class="highlight-sub">2022 and 2026 achieved the highest avg nightly rates. Shorter stays tend to command premium pricing.</div></div>
+        <div class="card"><div class="highlight-icon">🌵</div><div class="highlight-label">Top Market</div><div class="highlight-value" style="color:var(--coral)">Arizona</div><div class="highlight-sub">38 bookings from AZ guests (20% of all bookings). Phoenix alone accounts for 13 bookings.</div></div>
       </div>
-      <div class="card highlight-card">
-        <div class="highlight-icon">📈</div>
-        <div class="highlight-label">Highest Nightly Rate</div>
-        <div class="highlight-value" style="color:var(--teal)">$376/night</div>
-        <div class="highlight-sub">2022 and 2026 achieved the highest avg nightly rates. Shorter stays tend to command premium pricing.</div>
-      </div>
-      <div class="card highlight-card">
-        <div class="highlight-icon">🌵</div>
-        <div class="highlight-label">Top Market</div>
-        <div class="highlight-value" style="color:var(--coral)">Arizona</div>
-        <div class="highlight-sub">38 bookings from AZ guests (20% of all bookings). Phoenix alone accounts for 13 bookings.</div>
-      </div>
-    </div>
-
-    <div class="grid-2">
-      <div class="card">
-        <div class="card-title">Performance Highlights</div>
-        <div class="card-sub">Key observations from your booking data</div>
-        <div class="insight-item"><div class="insight-bar" style="background:var(--coral)"></div><div><div class="insight-label">Platform Mix</div><div class="insight-detail">90% Airbnb, 10% VRBO — but VRBO commands $374/night vs Airbnb's $252/night.</div></div></div>
-        <div class="insight-item"><div class="insight-bar" style="background:var(--teal)"></div><div><div class="insight-label">Seasonality</div><div class="insight-detail">Peak months are typically Feb-Apr and Oct-Dec. Summer (Jun-Aug) consistently shows lower occupancy.</div></div></div>
-        <div class="insight-item"><div class="insight-bar" style="background:var(--gold)"></div><div><div class="insight-label">Stay Length</div><div class="insight-detail">Average stay decreased from 7.8 nights (2021) to ~3-4 nights (2024-2026), suggesting a shift toward short-stay guests.</div></div></div>
-        <div class="insight-item"><div class="insight-bar" style="background:var(--purple)"></div><div><div class="insight-label">2024 Growth</div><div class="insight-detail">54.5% YoY revenue jump in 2024 — driven by doubling bookings to 53 with 225 total nights.</div></div></div>
-        <div class="insight-item"><div class="insight-bar" style="background:#3D5A80"></div><div><div class="insight-label">Repeat Guests</div><div class="insight-detail">Only 4.4% repeat rate. Opportunity to build loyalty through follow-up messages or returning guest discounts.</div></div></div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">Performance Highlights</div>
+          <div class="card-sub">Key observations from your booking data</div>
+          <div class="insight-item"><div class="insight-bar" style="background:var(--coral)"></div><div><div class="insight-label">Platform Mix</div><div class="insight-detail">90% Airbnb, 10% VRBO — but VRBO commands $374/night vs Airbnb's $252/night.</div></div></div>
+          <div class="insight-item"><div class="insight-bar" style="background:var(--teal)"></div><div><div class="insight-label">Seasonality</div><div class="insight-detail">Peak months are typically Feb-Apr and Oct-Dec. Summer (Jun-Aug) consistently shows lower occupancy.</div></div></div>
+          <div class="insight-item"><div class="insight-bar" style="background:var(--gold)"></div><div><div class="insight-label">Stay Length</div><div class="insight-detail">Average stay decreased from 7.8 nights (2021) to ~3-4 nights (2024-2026), suggesting a shift toward short-stay guests.</div></div></div>
+          <div class="insight-item"><div class="insight-bar" style="background:var(--purple)"></div><div><div class="insight-label">2024 Growth</div><div class="insight-detail">54.5% YoY revenue jump in 2024 — driven by doubling bookings to 53 with 225 total nights.</div></div></div>
+          <div class="insight-item"><div class="insight-bar" style="background:#3D5A80"></div><div><div class="insight-label">Repeat Guests</div><div class="insight-detail">Only 4.4% repeat rate. Opportunity to build loyalty through follow-up messages or returning guest discounts.</div></div></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Year-over-Year Comparison</div>
+          <div class="card-sub">Revenue and volume progression</div>
+          <div class="ch-300"><canvas id="chartYoy"></canvas></div>
+        </div>
       </div>
       <div class="card">
-        <div class="card-title">Year-over-Year Comparison</div>
-        <div class="card-sub">Revenue and volume progression</div>
-        <div style="position:relative;width:100%;height:300px"><canvas id="yoyChart"></canvas></div>
+        <div class="card-title">Recommendations</div>
+        <div class="card-sub">Data-driven suggestions to grow your rental income</div>
+        <div class="grid-3">
+          <div class="rec-card" style="background:rgba(255,180,0,0.06);border-color:var(--gold)"><div class="rec-icon">⚡</div><div class="rec-title">Boost Summer Occupancy</div><div class="rec-text">Jun-Aug is your slowest period. Consider lowering rates 15-20% or offering weekly discounts to fill gaps.</div></div>
+          <div class="rec-card" style="background:rgba(0,166,153,0.06);border-color:var(--teal)"><div class="rec-icon">🔄</div><div class="rec-title">Increase Repeat Rate</div><div class="rec-text">At 4.4%, there's huge upside. Send post-stay thank-you messages with a 10% return-guest discount code.</div></div>
+          <div class="rec-card" style="background:rgba(145,70,105,0.06);border-color:var(--purple)"><div class="rec-icon">📊</div><div class="rec-title">Grow VRBO Presence</div><div class="rec-text">VRBO averages $374/night vs $252 on Airbnb. Invest in VRBO listing optimization to capture more high-value bookings.</div></div>
+        </div>
       </div>
     </div>
 
-    <div class="card">
-      <div class="card-title">Recommendations</div>
-      <div class="card-sub">Data-driven suggestions to grow your rental income</div>
-      <div class="grid-3">
-        <div class="rec-card" style="background:rgba(255,180,0,0.06);border-color:var(--gold)">
-          <div class="rec-icon">⚡</div>
-          <div class="rec-title">Boost Summer Occupancy</div>
-          <div class="rec-text">Jun-Aug is your slowest period. Consider lowering rates 15-20% or offering weekly discounts to fill gaps.</div>
-        </div>
-        <div class="rec-card" style="background:rgba(0,166,153,0.06);border-color:var(--teal)">
-          <div class="rec-icon">🔄</div>
-          <div class="rec-title">Increase Repeat Rate</div>
-          <div class="rec-text">At 4.4%, there's huge upside. Send post-stay thank-you messages with a 10% return-guest discount code.</div>
-        </div>
-        <div class="rec-card" style="background:rgba(145,70,105,0.06);border-color:var(--purple)">
-          <div class="rec-icon">📊</div>
-          <div class="rec-title">Grow VRBO Presence</div>
-          <div class="rec-text">VRBO averages $374/night vs $252 on Airbnb. Invest in VRBO listing optimization to capture more high-value bookings.</div>
-        </div>
-      </div>
-    </div>
   </div>
-
 </main>
 
 <script>
-// ============ DATA ============
-const monthlyData = [
+// ===== DATA =====
+const MD = [
   {y:2021,m:1,p:2351.18,n:16,g:5,b:2},{y:2021,m:2,p:4006.45,n:31,g:3,b:1},{y:2021,m:3,p:4969.11,n:29,g:14,b:3},
   {y:2021,m:4,p:7485.69,n:25,g:16,b:5},{y:2021,m:5,p:2693.30,n:12,g:15,b:3},{y:2021,m:6,p:933.79,n:4,g:6,b:1},
   {y:2021,m:7,p:280.01,n:2,g:3,b:1},{y:2021,m:10,p:15757.94,n:80,g:19,b:5},{y:2021,m:11,p:1892.48,n:7,g:16,b:4},
@@ -512,8 +341,7 @@ const monthlyData = [
   {y:2026,m:4,p:1508.45,n:5,g:10,b:2},{y:2026,m:5,p:905.88,n:3,g:4,b:1},{y:2026,m:7,p:602.57,n:2,g:8,b:1},
   {y:2026,m:8,p:1513.10,n:5,g:4,b:1},
 ];
-
-const yearlyData = [
+const YD = [
   {year:2021,payout:44275.87,payment:62462.84,nights:219,guests:109,bookings:28,avgNight:248.36,commission:2240.90},
   {year:2022,payout:32738.92,payment:47945.31,nights:89,guests:93,bookings:23,avgNight:376.37,commission:1302.07},
   {year:2023,payout:27144.07,payment:42697.38,nights:149,guests:139,bookings:33,avgNight:200.79,commission:4975.29},
@@ -521,309 +349,228 @@ const yearlyData = [
   {year:2025,payout:35376.25,payment:54558.59,nights:113,guests:156,bookings:37,avgNight:311.43,commission:1339.83},
   {year:2026,payout:24993.98,payment:35997.14,nights:68,guests:80,bookings:18,avgNight:376.15,commission:846.42},
 ];
+const MO = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const CL = {coral:'#FF5A5F',teal:'#00A699',gold:'#FFB400',purple:'#914669'};
+const CC = ['#FF5A5F','#00A699','#FFB400','#914669','#3D5A80','#EE6C4D'];
 
-const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-const COLORS = {coral:'#FF5A5F',teal:'#00A699',gold:'#FFB400',purple:'#914669',navy:'#2D3436',slate:'#636E72'};
-const CHART_COLORS = ['#FF5A5F','#00A699','#FFB400','#914669','#3D5A80','#EE6C4D'];
-
-// ============ STATE ============
-let selectedYear = 'all';
+// ===== STATE =====
+let selYear = 'all';
 let charts = {};
 
-// ============ CHART DEFAULTS ============
+// ===== CHART DEFAULTS =====
 Chart.defaults.font.family = "'DM Sans', sans-serif";
 Chart.defaults.font.size = 12;
 Chart.defaults.color = '#8B8B8B';
 Chart.defaults.plugins.legend.display = false;
-Chart.defaults.scale.grid = { color: '#F0F0EC', drawBorder: false };
-Chart.defaults.scale.ticks = { padding: 6 };
 
-// ============ HELPERS ============
-function fmt(n) { return n >= 1000 ? '$' + (n/1000).toFixed(0) + 'k' : '$' + n; }
-function fmtFull(n) { return '$' + n.toLocaleString(undefined,{maximumFractionDigits:0}); }
-
-function getTotals(year) {
-  const d = year === 'all' ? yearlyData : yearlyData.filter(y => y.year == year);
-  const payout = d.reduce((s,r) => s+r.payout, 0);
-  const payment = d.reduce((s,r) => s+r.payment, 0);
-  const nights = d.reduce((s,r) => s+r.nights, 0);
-  const guests = d.reduce((s,r) => s+r.guests, 0);
-  const bookings = d.reduce((s,r) => s+r.bookings, 0);
-  return { payout, payment, nights, guests, bookings, avgNight: payout/Math.max(nights,1), avgStay: nights/Math.max(bookings,1) };
+// ===== HELPERS =====
+function fmt(n) { return n >= 1000 ? '$'+(n/1000).toFixed(0)+'k' : '$'+n; }
+function fmtF(n) { return '$'+n.toLocaleString(undefined,{maximumFractionDigits:0}); }
+function totals(yr) {
+  const d = yr==='all' ? YD : YD.filter(y=>y.year==yr);
+  const p=d.reduce((s,r)=>s+r.payout,0), pay=d.reduce((s,r)=>s+r.payment,0),
+        n=d.reduce((s,r)=>s+r.nights,0), g=d.reduce((s,r)=>s+r.guests,0), b=d.reduce((s,r)=>s+r.bookings,0);
+  return {p,pay,n,g,b,an:p/Math.max(n,1),as:n/Math.max(b,1)};
 }
-
-function getChartData(year) {
-  if (year === 'all') return yearlyData.map(y => ({ label: String(y.year), payout: y.payout, bookings: y.bookings }));
-  return MONTHS.map((m,i) => {
-    const d = monthlyData.find(r => r.y == year && r.m === i+1);
-    return { label: m, payout: d ? d.p : 0, bookings: d ? d.b : 0 };
-  });
+function chartData(yr) {
+  if(yr==='all') return YD.map(y=>({l:String(y.year),p:y.payout,b:y.bookings}));
+  return MO.map((m,i)=>{const d=MD.find(r=>r.y==yr&&r.m===i+1);return{l:m,p:d?d.p:0,b:d?d.b:0};});
 }
+function mk(id) { return document.getElementById(id); }
+function nuke(key) { if(charts[key]){charts[key].destroy();charts[key]=null;} }
 
-// ============ RENDER KPIs ============
+// ===== KPIs =====
 function renderKPIs() {
-  const t = getTotals(selectedYear);
-  const kpis = [
-    { label: 'Total Payout', value: '$'+(t.payout/1000).toFixed(1)+'K', sub: 'of $'+(t.payment/1000).toFixed(0)+'K gross', color: COLORS.coral },
-    { label: 'Bookings', value: t.bookings, sub: t.guests+' total guests', color: COLORS.teal },
-    { label: 'Nights Booked', value: t.nights, sub: t.avgStay.toFixed(1)+' avg stay', color: COLORS.gold },
-    { label: 'Avg / Night', value: '$'+t.avgNight.toFixed(0), sub: 'net payout rate', color: COLORS.purple },
-    { label: 'Guests / Booking', value: (t.guests/Math.max(t.bookings,1)).toFixed(1), sub: 'avg group size', color: '#3D5A80' },
-  ];
-  const grid = document.getElementById('kpiGrid');
-  grid.innerHTML = kpis.map((k,i) => `
-    <div class="kpi-card animate-in delay-${i+1}">
-      <div class="kpi-accent" style="background:${k.color}"></div>
-      <div class="kpi-label">${k.label}</div>
-      <div class="kpi-value">${k.value}</div>
-      <div class="kpi-sub">${k.sub}</div>
-    </div>
-  `).join('');
+  const t = totals(selYear);
+  mk('kpiGrid').innerHTML = [
+    {l:'Total Payout',v:'$'+(t.p/1000).toFixed(1)+'K',s:'of $'+(t.pay/1000).toFixed(0)+'K gross',c:CL.coral},
+    {l:'Bookings',v:t.b,s:t.g+' total guests',c:CL.teal},
+    {l:'Nights Booked',v:t.n,s:t.as.toFixed(1)+' avg stay',c:CL.gold},
+    {l:'Avg / Night',v:'$'+t.an.toFixed(0),s:'net payout rate',c:CL.purple},
+    {l:'Guests / Booking',v:(t.g/Math.max(t.b,1)).toFixed(1),s:'avg group size',c:'#3D5A80'},
+  ].map((k,i)=>`<div class="kpi-card anim d${i+1}"><div class="kpi-accent" style="background:${k.c}"></div><div class="kpi-label">${k.l}</div><div class="kpi-value">${k.v}</div><div class="kpi-sub">${k.s}</div></div>`).join('');
 }
 
-// ============ OVERVIEW CHARTS ============
-function renderRevenueChart() {
-  const data = getChartData(selectedYear);
-  const title = selectedYear === 'all' ? 'Revenue by Year' : selectedYear + ' Revenue';
-  const sub = selectedYear === 'all' ? 'Yearly payout totals' : 'Monthly breakdown for ' + selectedYear;
-  document.getElementById('revenueChartTitle').textContent = title;
-  document.getElementById('revenueChartSub').textContent = sub;
-
-  if (charts.revenue) charts.revenue.destroy();
-  charts.revenue = new Chart(document.getElementById('revenueChart'), {
-    type: 'bar',
-    data: {
-      labels: data.map(d => d.label),
-      datasets: [
-        {
-          label: 'Payout', data: data.map(d => d.payout), type: 'line',
-          borderColor: COLORS.coral, backgroundColor: 'rgba(255,90,95,0.08)',
-          borderWidth: 2.5, fill: true, tension: 0.3, pointRadius: 4,
-          pointBackgroundColor: COLORS.coral, pointBorderColor: '#fff', pointBorderWidth: 2,
-          yAxisID: 'y',
-        },
-        {
-          label: 'Bookings', data: data.map(d => d.bookings),
-          backgroundColor: 'rgba(0,166,153,0.6)', borderRadius: 6, barPercentage: 0.5,
-          yAxisID: 'y1',
-        }
-      ]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { display: true, position: 'top', labels: { usePointStyle: true, padding: 16, font: { size: 12 } } } },
-      scales: {
-        y: { position: 'left', ticks: { callback: v => fmt(v) } },
-        y1: { position: 'right', grid: { display: false }, ticks: { stepSize: 1 } },
-      }
+// ===== CHART RENDERS =====
+function renderRevenue() {
+  const d=chartData(selYear);
+  mk('revTitle').textContent = selYear==='all'?'Revenue by Year':selYear+' Revenue';
+  mk('revSub').textContent = selYear==='all'?'Yearly payout totals':'Monthly breakdown for '+selYear;
+  nuke('rev');
+  charts.rev = new Chart(mk('chartRevenue'),{
+    type:'bar',
+    data:{labels:d.map(x=>x.l),datasets:[
+      {label:'Payout',data:d.map(x=>x.p),type:'line',borderColor:CL.coral,backgroundColor:'rgba(255,90,95,0.08)',borderWidth:2.5,fill:true,tension:0.3,pointRadius:4,pointBackgroundColor:CL.coral,pointBorderColor:'#fff',pointBorderWidth:2,yAxisID:'y'},
+      {label:'Bookings',data:d.map(x=>x.b),backgroundColor:'rgba(0,166,153,0.6)',borderRadius:6,barPercentage:0.5,yAxisID:'y1'}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:true,position:'top',labels:{usePointStyle:true,padding:16,font:{size:12}}}},
+      scales:{y:{position:'left',grid:{color:'#F0F0EC'},ticks:{callback:v=>fmt(v)}},y1:{position:'right',grid:{display:false},ticks:{stepSize:1}}}
     }
   });
 }
 
-function renderPlatformChart() {
-  if (charts.platform) charts.platform.destroy();
-  charts.platform = new Chart(document.getElementById('platformChart'), {
-    type: 'doughnut',
-    data: {
-      labels: ['Airbnb','VRBO'],
-      datasets: [{ data: [173, 19], backgroundColor: [COLORS.coral, COLORS.teal], borderWidth: 0, spacing: 4 }]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false, cutout: '62%',
-      plugins: { legend: { display: false } }
+function renderPlatform() {
+  nuke('plat');
+  charts.plat = new Chart(mk('chartPlatform'),{
+    type:'doughnut',
+    data:{labels:['Airbnb','VRBO'],datasets:[{data:[173,19],backgroundColor:[CL.coral,CL.teal],borderWidth:0,spacing:4}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'62%'}
+  });
+}
+
+function renderDow() {
+  nuke('dow');
+  charts.dow = new Chart(mk('chartDow'),{
+    type:'bar',
+    data:{labels:['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],datasets:[{label:'Avg/Night',data:[196,252,229,317,282,248,271],backgroundColor:CL.gold,borderRadius:6,barPercentage:0.55}]},
+    options:{responsive:true,maintainAspectRatio:false,scales:{y:{grid:{color:'#F0F0EC'},ticks:{callback:v=>'$'+v}},x:{grid:{display:false}}}}
+  });
+}
+
+function renderFinancial() {
+  nuke('fin');
+  charts.fin = new Chart(mk('chartFinancial'),{
+    type:'bar',
+    data:{labels:YD.map(y=>y.year),datasets:[
+      {label:'Gross Payment',data:YD.map(y=>y.payment),backgroundColor:'#E8E8E4',borderRadius:6,barPercentage:0.6},
+      {label:'Net Payout',data:YD.map(y=>y.payout),backgroundColor:CL.coral,borderRadius:6,barPercentage:0.6},
+      {label:'Commission',data:YD.map(y=>y.commission),backgroundColor:CL.purple,borderRadius:6,barPercentage:0.6},
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:true,position:'top',labels:{usePointStyle:true,padding:16,font:{size:12}}}},
+      scales:{y:{grid:{color:'#F0F0EC'},ticks:{callback:v=>fmt(v)}},x:{grid:{display:false}}}
     }
   });
 }
 
-function renderDowChart() {
-  const data = [196,252,229,317,282,248,271];
-  if (charts.dow) charts.dow.destroy();
-  charts.dow = new Chart(document.getElementById('dowChart'), {
-    type: 'bar',
-    data: {
-      labels: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
-      datasets: [{ label: 'Avg/Night', data: data, backgroundColor: COLORS.gold, borderRadius: 6, barPercentage: 0.55 }]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      scales: { y: { ticks: { callback: v => '$'+v } } }
+function renderNightly() {
+  nuke('nightly');
+  charts.nightly = new Chart(mk('chartNightly'),{
+    type:'line',
+    data:{labels:YD.map(y=>y.year),datasets:[{label:'Avg/Night',data:YD.map(y=>y.avgNight),borderColor:CL.teal,backgroundColor:'rgba(0,166,153,0.08)',borderWidth:2.5,fill:true,tension:0.3,pointRadius:5,pointBackgroundColor:CL.teal,pointBorderColor:'#fff',pointBorderWidth:2}]},
+    options:{responsive:true,maintainAspectRatio:false,scales:{y:{grid:{color:'#F0F0EC'},ticks:{callback:v=>'$'+v}},x:{grid:{display:false}}}}
+  });
+}
+
+function renderNights() {
+  nuke('nights');
+  charts.nights = new Chart(mk('chartNights'),{
+    type:'bar',
+    data:{labels:YD.map(y=>y.year),datasets:[{label:'Nights',data:YD.map(y=>y.nights),backgroundColor:CC,borderRadius:6,barPercentage:0.55}]},
+    options:{responsive:true,maintainAspectRatio:false,scales:{y:{grid:{color:'#F0F0EC'}},x:{grid:{display:false}}}}
+  });
+}
+
+function renderTable() {
+  mk('yearTable').innerHTML = YD.map(y=>`<tr><td class="td-bold">${y.year}</td><td>${fmtF(y.payment)}</td><td class="td-coral">${fmtF(y.payout)}</td><td class="td-purple">${fmtF(y.commission)}</td><td>${y.bookings}</td><td>${y.nights}</td><td>${y.guests}</td><td class="td-teal">$${y.avgNight.toFixed(0)}</td><td>${(y.nights/y.bookings).toFixed(1)} nights</td></tr>`).join('');
+}
+
+function renderStates() {
+  nuke('states');
+  charts.states = new Chart(mk('chartStates'),{
+    type:'bar',
+    data:{labels:['AZ','CA','NY','CO','WA','TX','FL','NC','MT','MA'],datasets:[{label:'Bookings',data:[38,18,12,10,10,5,4,3,3,3],backgroundColor:[38,18,12,10,10,5,4,3,3,3].map((_,i)=>`rgba(255,90,95,${1-i*0.08})`),borderRadius:6,barPercentage:0.55}]},
+    options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',scales:{x:{grid:{color:'#F0F0EC'}},y:{grid:{display:false}}}}
+  });
+}
+
+function renderCities() {
+  nuke('cities');
+  charts.cities = new Chart(mk('chartCities'),{
+    type:'bar',
+    data:{labels:['Phoenix','Tucson','New York','Seattle','San Diego','Los Angeles','Flagstaff','Dallas','Las Vegas'],datasets:[{label:'Bookings',data:[13,9,8,8,5,4,4,3,3],backgroundColor:[13,9,8,8,5,4,4,3,3].map((_,i)=>`rgba(0,166,153,${1-i*0.08})`),borderRadius:6,barPercentage:0.55}]},
+    options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',scales:{x:{grid:{color:'#F0F0EC'}},y:{grid:{display:false}}}}
+  });
+}
+
+function renderGuestTrend() {
+  nuke('gtrend');
+  charts.gtrend = new Chart(mk('chartGuestTrend'),{
+    type:'line',
+    data:{labels:YD.map(y=>y.year),datasets:[{label:'Guests',data:YD.map(y=>y.guests),borderColor:CL.purple,backgroundColor:'rgba(145,70,105,0.08)',borderWidth:2.5,fill:true,tension:0.3,pointRadius:5,pointBackgroundColor:CL.purple,pointBorderColor:'#fff',pointBorderWidth:2}]},
+    options:{responsive:true,maintainAspectRatio:false,scales:{y:{grid:{color:'#F0F0EC'}},x:{grid:{display:false}}}}
+  });
+}
+
+function renderYoy() {
+  nuke('yoy');
+  charts.yoy = new Chart(mk('chartYoy'),{
+    type:'bar',
+    data:{labels:YD.map(y=>y.year),datasets:[
+      {label:'Payout',data:YD.map(y=>y.payout),backgroundColor:'rgba(255,90,95,0.8)',borderRadius:6,barPercentage:0.45,yAxisID:'y'},
+      {label:'Bookings',data:YD.map(y=>y.bookings),type:'line',borderColor:CL.teal,borderWidth:2.5,pointRadius:5,pointBackgroundColor:CL.teal,pointBorderColor:'#fff',pointBorderWidth:2,yAxisID:'y1'},
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:true,position:'top',labels:{usePointStyle:true,padding:16,font:{size:12}}}},
+      scales:{y:{position:'left',grid:{color:'#F0F0EC'},ticks:{callback:v=>fmt(v)}},y1:{position:'right',grid:{display:false}}}
     }
   });
 }
 
-// ============ REVENUE CHARTS ============
-function renderFinancialChart() {
-  if (charts.financial) charts.financial.destroy();
-  charts.financial = new Chart(document.getElementById('financialChart'), {
-    type: 'bar',
-    data: {
-      labels: yearlyData.map(y => y.year),
-      datasets: [
-        { label: 'Gross Payment', data: yearlyData.map(y => y.payment), backgroundColor: '#E8E8E4', borderRadius: 6, barPercentage: 0.6 },
-        { label: 'Net Payout', data: yearlyData.map(y => y.payout), backgroundColor: COLORS.coral, borderRadius: 6, barPercentage: 0.6 },
-        { label: 'Commission', data: yearlyData.map(y => y.commission), backgroundColor: COLORS.purple, borderRadius: 6, barPercentage: 0.6 },
-      ]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { display: true, position: 'top', labels: { usePointStyle: true, padding: 16, font: { size: 12 } } } },
-      scales: { y: { ticks: { callback: v => fmt(v) } } }
+// ===== INITIALIZATION: Render ALL charts while all panels are visible =====
+function initAll() {
+  // Temporarily show all panels so Chart.js can measure them
+  document.querySelectorAll('.tab-panel').forEach(p => {
+    p.style.position = 'relative';
+    p.style.left = '0';
+    p.style.visibility = 'visible';
+  });
+
+  renderKPIs();
+  renderRevenue();
+  renderPlatform();
+  renderDow();
+  renderFinancial();
+  renderNightly();
+  renderNights();
+  renderTable();
+  renderStates();
+  renderCities();
+  renderGuestTrend();
+  renderYoy();
+
+  // Now hide all panels except the active one
+  document.querySelectorAll('.tab-panel').forEach(p => {
+    if (!p.classList.contains('active')) {
+      p.style.position = '';
+      p.style.left = '';
+      p.style.visibility = '';
     }
   });
 }
 
-function renderNightlyChart() {
-  if (charts.nightly) charts.nightly.destroy();
-  charts.nightly = new Chart(document.getElementById('nightlyChart'), {
-    type: 'line',
-    data: {
-      labels: yearlyData.map(y => y.year),
-      datasets: [{
-        label: 'Avg/Night', data: yearlyData.map(y => y.avgNight),
-        borderColor: COLORS.teal, backgroundColor: 'rgba(0,166,153,0.08)',
-        borderWidth: 2.5, fill: true, tension: 0.3, pointRadius: 5,
-        pointBackgroundColor: COLORS.teal, pointBorderColor: '#fff', pointBorderWidth: 2,
-      }]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      scales: { y: { ticks: { callback: v => '$'+v } } }
-    }
-  });
-}
+// Run after page is fully loaded
+window.addEventListener('load', initAll);
 
-function renderNightsChart() {
-  if (charts.nights) charts.nights.destroy();
-  charts.nights = new Chart(document.getElementById('nightsChart'), {
-    type: 'bar',
-    data: {
-      labels: yearlyData.map(y => y.year),
-      datasets: [{
-        label: 'Nights', data: yearlyData.map(y => y.nights),
-        backgroundColor: CHART_COLORS, borderRadius: 6, barPercentage: 0.55,
-      }]
-    },
-    options: { responsive: true, maintainAspectRatio: false }
-  });
-}
-
-function renderYearTable() {
-  document.getElementById('yearTable').innerHTML = yearlyData.map(y => `
-    <tr>
-      <td class="td-bold">${y.year}</td>
-      <td>${fmtFull(y.payment)}</td>
-      <td class="td-coral">${fmtFull(y.payout)}</td>
-      <td class="td-purple">${fmtFull(y.commission)}</td>
-      <td>${y.bookings}</td><td>${y.nights}</td><td>${y.guests}</td>
-      <td class="td-teal">$${y.avgNight.toFixed(0)}</td>
-      <td>${(y.nights/y.bookings).toFixed(1)} nights</td>
-    </tr>
-  `).join('');
-}
-
-// ============ GUESTS CHARTS ============
-function renderStatesChart() {
-  const states = ['AZ','CA','NY','CO','WA','TX','FL','NC','MT','MA'];
-  const vals = [38,18,12,10,10,5,4,3,3,3];
-  if (charts.states) charts.states.destroy();
-  charts.states = new Chart(document.getElementById('statesChart'), {
-    type: 'bar',
-    data: {
-      labels: states,
-      datasets: [{ label: 'Bookings', data: vals, backgroundColor: vals.map((_,i) => `rgba(255,90,95,${1 - i*0.08})`), borderRadius: 6, barPercentage: 0.55 }]
-    },
-    options: { responsive: true, maintainAspectRatio: false, indexAxis: 'y' }
-  });
-}
-
-function renderCitiesChart() {
-  const cities = ['Phoenix','Tucson','New York','Seattle','San Diego','Los Angeles','Flagstaff','Dallas','Las Vegas'];
-  const vals = [13,9,8,8,5,4,4,3,3];
-  if (charts.cities) charts.cities.destroy();
-  charts.cities = new Chart(document.getElementById('citiesChart'), {
-    type: 'bar',
-    data: {
-      labels: cities,
-      datasets: [{ label: 'Bookings', data: vals, backgroundColor: vals.map((_,i) => `rgba(0,166,153,${1 - i*0.08})`), borderRadius: 6, barPercentage: 0.55 }]
-    },
-    options: { responsive: true, maintainAspectRatio: false, indexAxis: 'y' }
-  });
-}
-
-function renderGuestTrendChart() {
-  if (charts.guestTrend) charts.guestTrend.destroy();
-  charts.guestTrend = new Chart(document.getElementById('guestTrendChart'), {
-    type: 'line',
-    data: {
-      labels: yearlyData.map(y => y.year),
-      datasets: [{
-        label: 'Guests', data: yearlyData.map(y => y.guests),
-        borderColor: COLORS.purple, backgroundColor: 'rgba(145,70,105,0.08)',
-        borderWidth: 2.5, fill: true, tension: 0.3, pointRadius: 5,
-        pointBackgroundColor: COLORS.purple, pointBorderColor: '#fff', pointBorderWidth: 2,
-      }]
-    },
-    options: { responsive: true, maintainAspectRatio: false }
-  });
-}
-
-// ============ INSIGHTS CHARTS ============
-function renderYoyChart() {
-  if (charts.yoy) charts.yoy.destroy();
-  charts.yoy = new Chart(document.getElementById('yoyChart'), {
-    type: 'bar',
-    data: {
-      labels: yearlyData.map(y => y.year),
-      datasets: [
-        { label: 'Payout', data: yearlyData.map(y => y.payout), backgroundColor: 'rgba(255,90,95,0.8)', borderRadius: 6, barPercentage: 0.45, yAxisID: 'y' },
-        { label: 'Bookings', data: yearlyData.map(y => y.bookings), type: 'line', borderColor: COLORS.teal, borderWidth: 2.5,
-          pointRadius: 5, pointBackgroundColor: COLORS.teal, pointBorderColor: '#fff', pointBorderWidth: 2, yAxisID: 'y1' },
-      ]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { display: true, position: 'top', labels: { usePointStyle: true, padding: 16, font: { size: 12 } } } },
-      scales: {
-        y: { position: 'left', ticks: { callback: v => fmt(v) } },
-        y1: { position: 'right', grid: { display: false } },
-      }
-    }
-  });
-}
-
-// ============ TAB NAVIGATION ============
-document.getElementById('tabs').addEventListener('click', e => {
+// ===== TAB NAV =====
+mk('tabs').addEventListener('click', e => {
   if (!e.target.classList.contains('tab-btn')) return;
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
   e.target.classList.add('active');
   const tab = e.target.dataset.tab;
-  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-  document.getElementById('tab-' + tab).classList.add('active');
-
-  // Render charts AFTER the tab is visible (setTimeout ensures display:block is applied)
-  setTimeout(() => {
-    if (tab === 'overview') { renderRevenueChart(); renderPlatformChart(); renderDowChart(); }
-    if (tab === 'revenue') { renderFinancialChart(); renderNightlyChart(); renderNightsChart(); renderYearTable(); }
-    if (tab === 'guests') { renderStatesChart(); renderCitiesChart(); renderGuestTrendChart(); }
-    if (tab === 'insights') { renderYoyChart(); }
-  }, 50);
+  document.querySelectorAll('.tab-panel').forEach(p => {
+    p.classList.remove('active');
+    p.style.position = '';
+    p.style.left = '';
+    p.style.visibility = '';
+  });
+  const panel = mk('tab-' + tab);
+  panel.classList.add('active');
+  panel.style.position = 'relative';
+  panel.style.left = '0';
+  panel.style.visibility = 'visible';
 });
 
-// ============ YEAR FILTER ============
-document.getElementById('yearFilter').addEventListener('click', e => {
+// ===== YEAR FILTER =====
+mk('yearFilter').addEventListener('click', e => {
   if (!e.target.classList.contains('year-btn')) return;
   document.querySelectorAll('.year-btn').forEach(b => b.classList.remove('active'));
   e.target.classList.add('active');
-  selectedYear = e.target.dataset.year;
+  selYear = e.target.dataset.year;
   renderKPIs();
-  renderRevenueChart();
+  renderRevenue();
 });
-
-// ============ INIT ============
-renderKPIs();
-renderRevenueChart();
-renderPlatformChart();
-renderDowChart();
 </script>
 </body>
 </html>
